@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prediksi Diabetes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#EEF4F3;--surface:#FFFFFF;--ink:#0E2A2F;--muted:#50696D;--line:#D2E0DE;
+  --accent:#0B7A75;--accent-ink:#FFFFFF;--ok:#12805C;--warn:#B45309;--bad:#BE2D45;--track:#DCE8E6;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--bg:#0A1B1E;--surface:#10272B;--ink:#E6F2F0;--muted:#9BB5B3;--line:#1F3D41;
+  --accent:#3FC5BC;--accent-ink:#06201F;--ok:#4ADE9E;--warn:#F5A94A;--bad:#FF7B8F;--track:#1B3538}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0A1B1E;--surface:#10272B;--ink:#E6F2F0;--muted:#9BB5B3;--line:#1F3D41;
+  --accent:#3FC5BC;--accent-ink:#06201F;--ok:#4ADE9E;--warn:#F5A94A;--bad:#FF7B8F;--track:#1B3538}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.6 "Public Sans",system-ui,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 20px 56px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:36px}
+.brand{font:700 18px "Bricolage Grotesque",sans-serif;display:flex;align-items:center;gap:10px}
+.brand i{width:14px;height:14px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--accent);display:block}
+button{font:inherit;cursor:pointer}
+.theme{background:none;border:1px solid var(--line);color:var(--ink);padding:6px 14px;border-radius:999px}
+h1{font:700 clamp(32px,6vw,56px)/1.08 "Bricolage Grotesque",sans-serif;margin:0 0 14px;max-width:16ch;letter-spacing:-.02em}
+.lead{color:var(--muted);max-width:56ch;margin:0 0 36px}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;align-items:start}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px}
+.panel h2{font:700 20px "Bricolage Grotesque",sans-serif;margin:0 0 18px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:480px){.fields{grid-template-columns:1fr}}
+label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+label small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+input{width:100%;font:inherit;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+input:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.full{grid-column:1/-1}
+.go{width:100%;margin-top:20px;padding:14px;border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:16px}
+.reset{background:none;border:0;color:var(--muted);text-decoration:underline;margin-top:10px;padding:4px}
+.err{color:var(--bad);font-size:14px;min-height:20px;margin:12px 0 0}
+.gauge{width:100%;max-width:320px;display:block;margin:0 auto}
+.pct{font:700 44px "Bricolage Grotesque",sans-serif;text-anchor:middle;fill:var(--ink)}
+.verdict{text-align:center;font:700 20px "Bricolage Grotesque",sans-serif;margin:6px 0 4px}
+.sub{text-align:center;color:var(--muted);font-size:14px;margin:0 0 18px}
+.empty{color:var(--muted);text-align:center;font-size:14px;margin:0}
+.factors{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.factors li{display:grid;grid-template-columns:110px 1fr 44px;gap:10px;align-items:center;font-size:14px}
+.bar{height:8px;border-radius:99px;background:var(--track);overflow:hidden}
+.bar b{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .5s}
+.val{color:var(--muted);text-align:right}
+.about{margin-top:20px}
+.about p{color:var(--muted);margin:0 0 10px;font-size:14px}
+.note{border-left:4px solid var(--warn);padding:10px 14px;background:var(--surface);border-radius:0 10px 10px 0;margin-top:24px;font-size:14px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><i></i>CekGula</div>
+    <button class="theme" id="theme" type="button">Ganti tema</button>
+  </header>
+
+  <h1>Perkirakan risiko diabetes dari lima data</h1>
+  <p class="lead">Isi data kesehatan di bawah. Hasil berupa perkiraan peluang dan status “Terindikasi” atau “Tidak terindikasi”, berdasarkan pola dataset Pima Indians Diabetes.</p>
+
+  <div class="grid">
+    <section class="panel" aria-labelledby="fh">
+      <h2 id="fh">Data pasien</h2>
+      <div class="fields">
+        <div><label for="preg">Kehamilan<small>Jumlah kehamilan</small></label><input id="preg" type="number" inputmode="numeric" min="0" max="20" placeholder="mis. 2"></div>
+        <div><label for="age">Usia<small>Tahun</small></label><input id="age" type="number" inputmode="numeric" min="18" max="100" placeholder="mis. 35"></div>
+        <div><label for="glu">Glukosa<small>mg/dL, tes toleransi glukosa</small></label><input id="glu" type="number" inputmode="numeric" min="40" max="300" placeholder="mis. 120"></div>
+        <div><label for="bmi">IMT<small>Indeks massa tubuh (kg/m²)</small></label><input id="bmi" type="number" inputmode="decimal" step="0.1" min="10" max="70" placeholder="mis. 28.5"></div>
+        <div class="full"><label for="skin">Ketebalan kulit<small>mm, lipatan kulit trisep</small></label><input id="skin" type="number" inputmode="numeric" min="0" max="100" placeholder="mis. 20"></div>
+      </div>
+      <p class="err" id="err" role="alert"></p>
+      <button class="go" id="go" type="button">Hitung prediksi</button>
+      <button class="reset" id="reset" type="button">Kosongkan isian</button>
+    </section>
+
+    <section class="panel" aria-live="polite" aria-labelledby="rh">
+      <h2 id="rh">Hasil prediksi</h2>
+      <svg class="gauge" viewBox="0 0 240 150" role="img" aria-label="Pengukur peluang diabetes">
+        <path d="M30 125 A90 90 0 0 1 210 125" fill="none" stroke="var(--track)" stroke-width="18" stroke-linecap="round"/>
+        <path id="arc" d="M30 125 A90 90 0 0 1 210 125" fill="none" stroke="var(--accent)" stroke-width="18" stroke-linecap="round" pathLength="100" stroke-dasharray="0 100" style="transition:stroke-dasharray .7s ease,stroke .3s"/>
+        <text class="pct" x="120" y="112" id="pct">–</text>
+      </svg>
+      <div class="verdict" id="verdict">Belum ada hasil</div>
+      <p class="sub" id="sub">Isi data lalu tekan “Hitung prediksi”.</p>
+      <ul class="factors" id="factors"></ul>
+    </section>
+  </div>
+
+  <section class="panel about">
+    <h2>Tentang model</h2>
+    <p>Proyek asli memakai K-Nearest Neighbors dengan fitur Kehamilan, Glukosa, Ketebalan Kulit, IMT, dan Usia. Tekanan darah, insulin, dan fungsi silsilah dibuang saat seleksi fitur.</p>
+    <p>Halaman ini berjalan sepenuhnya di browser, jadi file model (.pkl) tidak bisa dimuat. Hitungannya memakai pendekatan regresi logistik dengan bobot perkiraan dari pola dataset yang sama. Untuk hasil identik dengan model KNN Anda, jalankan model lewat Gradio, Hugging Face Spaces, atau Flask.</p>
+  </section>
+
+  <div class="note">Alat ini hanya untuk pembelajaran. Hasilnya bukan diagnosis medis. Periksakan kadar gula darah Anda ke dokter atau laboratorium.</div>
+</div>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var root=document.documentElement;
+  try{var t=localStorage.getItem("theme");if(t)root.setAttribute("data-theme",t)}catch(e){}
+  $("theme").onclick=function(){
+    var dark=root.getAttribute("data-theme")?root.getAttribute("data-theme")==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+    var n=dark?"light":"dark";root.setAttribute("data-theme",n);
+    try{localStorage.setItem("theme",n)}catch(e){}
+  };
+
+  var W={preg:.13,glu:.037,skin:.003,bmi:.085,age:.012},B=-9.0;
+  var ids=["preg","glu","skin","bmi","age"];
+  var rng={preg:[0,20,"Kehamilan"],glu:[40,300,"Glukosa"],skin:[0,100,"Ketebalan kulit"],bmi:[10,70,"IMT"],age:[18,100,"Usia"]};
+
+  function run(){
+    var v={},msg="";
+    ids.forEach(function(k){
+      var raw=$(k).value.trim(),n=parseFloat(raw);
+      if(raw===""||isNaN(n)){msg=msg||"Isi kolom "+rng[k][2]+" terlebih dahulu.";return}
+      if(n<rng[k][0]||n>rng[k][1]){msg=msg||rng[k][2]+" harus antara "+rng[k][0]+" dan "+rng[k][1]+".";return}
+      v[k]=n;
+    });
+    $("err").textContent=msg;if(msg)return;
+
+    var z=B,contrib={};
+    ids.forEach(function(k){contrib[k]=W[k]*v[k];z+=contrib[k]});
+    var p=1/(1+Math.exp(-z)),pc=Math.round(p*100),pos=p>=.5;
+    var col=p<.35?"var(--ok)":p<.5?"var(--warn)":"var(--bad)";
+    $("arc").style.stroke=col;$("arc").setAttribute("stroke-dasharray",pc+" 100");
+    $("pct").textContent=pc+"%";
+    $("verdict").textContent=pos?"Terindikasi penyakit diabetes":"Tidak terindikasi penyakit diabetes";
+    $("verdict").style.color=col;
+    $("sub").textContent=pos?"Peluang di atas 50%. Sebaiknya lakukan pemeriksaan gula darah.":"Peluang di bawah 50%. Tetap jaga pola makan dan aktivitas fisik.";
+
+    var tot=0;ids.forEach(function(k){tot+=contrib[k]});
+    $("factors").innerHTML=ids.map(function(k){
+      var s=Math.round(contrib[k]/tot*100);
+      return '<li><span>'+rng[k][2]+'</span><span class="bar"><b style="width:'+s+'%"></b></span><span class="val">'+s+'%</span></li>';
+    }).join("");
+  }
+  $("go").onclick=run;
+  ids.forEach(function(k){$(k).addEventListener("keydown",function(e){if(e.key==="Enter")run()})});
+  $("reset").onclick=function(){
+    ids.forEach(function(k){$(k).value=""});$("err").textContent="";
+    $("arc").setAttribute("stroke-dasharray","0 100");$("pct").textContent="–";
+    $("verdict").textContent="Belum ada hasil";$("verdict").style.color="";
+    $("sub").textContent="Isi data lalu tekan “Hitung prediksi”.";$("factors").innerHTML="";
+  };
+})();
+</script>
+</body>
+</html>
